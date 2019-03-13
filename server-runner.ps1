@@ -66,6 +66,7 @@ if (-not $RunInBackground) {
             }
         }
         
+        Receive-Job $serverJob.Id
         Start-Sleep -s 1
     } 
 }

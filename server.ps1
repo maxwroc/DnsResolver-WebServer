@@ -37,6 +37,10 @@ $routes = @{
         $response["ip"] = $ip
         
         return $response | ConvertTo-Json -Depth 2
+    };
+    "/sleep" = {
+        Start-Sleep -s 20
+        return "Ups... sorry, I was sleeping"
     }
 }
 

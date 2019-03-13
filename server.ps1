@@ -6,16 +6,7 @@ Add-Type -AssemblyName System.Web
 
 $routes = @{
     "/dns" = { 
-        Param($requestUrl)
-        $queryParams = [System.Web.HttpUtility]::ParseQueryString($requestUrl.Query)
-        
-        if ($queryParams) {
-            $queryParams.GetEnumerator() | % { 
-                if ($_.Key) {
-                    $queryParams[$_.Key] = $_.Value 
-                }
-            }
-        }
+        Param($queryParams)
         
         $response = @{
             host = $queryParams["host"]
@@ -39,8 +30,24 @@ $routes = @{
         return $response | ConvertTo-Json -Depth 2
     };
     "/sleep" = {
-        Start-Sleep -s 20
-        return "Ups... sorry, I was sleeping"
+        Param($queryParams)
+        
+        $delay = 2000
+        
+        if ($queryParams["delay"]) {
+            $delay = $queryParams["delay"]
+        }
+        
+        Start-Sleep -Milliseconds $delay
+        return "Ups... sorry, I was sleeping $($delay)ms"
+    }
+}
+
+Function PrintAdditionalRequestInfo {
+    Param($request, $print)
+    
+    if ($print -eq "cookies") {
+        Write-Host "> Cookie: $($request.Headers["Cookie"])"
     }
 }
 
@@ -61,7 +68,7 @@ while ($listener.IsListening)
     $requestUrl = $context.Request.Url
     $response = $context.Response
 
-    Write-Host ''
+    Write-Host ""
     Write-Host "> $requestUrl"
 
     $localPath = $requestUrl.LocalPath
@@ -73,7 +80,19 @@ while ($listener.IsListening)
     }
     else
     {
-        $content = Invoke-Command $route -ArgumentList @($requestUrl)
+        $queryParams = [System.Web.HttpUtility]::ParseQueryString($requestUrl.Query)
+        $parsedParams = @{}
+        if ($queryParams) {
+            $queryParams.GetEnumerator() | % { 
+                $parsedParams.Add($_, $queryParams[$_])
+            }
+        }
+        
+        if ($parsedParams["print"]) {
+            PrintAdditionalRequestInfo $context.Request $parsedParams["print"]
+        }
+    
+        $content = Invoke-Command $route -ArgumentList @($parsedParams)
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($content)
         $response.ContentLength64 = $buffer.Length
         $response.OutputStream.Write($buffer, 0, $buffer.Length)

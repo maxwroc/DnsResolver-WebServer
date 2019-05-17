@@ -5,9 +5,10 @@
     .DESCRIPTION
     This script allows to run the server in background job (unblocking current command line), stop the background server job and restart server when changes are detected.
 
+    TODO: Watch mode
     .EXAMPLE
-    server-runner.ps1 -RunInBackground -Watch
-    # Runs server in background mode and watches server.ps1 file for changes.
+    server-runner.ps1 -RunInBackground
+    # Runs server in background mode, unblocking current command prompt.
 
     .EXAMPLE
     server-runner.ps1 -Url "http://localhost:8084/" -Stop

@@ -62,7 +62,6 @@ if ($Stop) {
 }
 
 $serverJob = Start-Job -FilePath "$PSScriptRoot\server.ps1" -ArgumentList $Url -Name $jobName
-Write-Host "To get server logs use the following cmd: Receive-Job $($serverJob.Id))"
 Write-Host "Listening at $Url..."
 
 if ($Watch) {
@@ -101,4 +100,7 @@ if (-not $RunInBackground) {
         Receive-Job $serverJob.Id
         Start-Sleep -s 1
     }
+}
+else {
+    Write-Host "To get server logs use the following cmd: Receive-Job $($serverJob.Id))"
 }

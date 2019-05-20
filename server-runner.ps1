@@ -5,10 +5,9 @@
     .DESCRIPTION
     This script allows to run the server in background job (unblocking current command line), stop the background server job and restart server when changes are detected.
 
-    TODO: Watch mode
     .EXAMPLE
-    server-runner.ps1 -RunInBackground
-    # Runs server in background mode, unblocking current command prompt.
+    server-runner.ps1 -RunInBackground -Watch
+    # Runs server in background mode and watches server.ps1 file for changes.
 
     .EXAMPLE
     server-runner.ps1 -Url "http://localhost:8084/" -Stop
@@ -63,6 +62,7 @@ if ($Stop) {
 }
 
 $serverJob = Start-Job -FilePath "$PSScriptRoot\server.ps1" -ArgumentList $Url -Name $jobName
+Write-Host "To get server logs use the following cmd: Receive-Job $($serverJob.Id))"
 Write-Host "Listening at $Url..."
 
 if ($Watch) {
@@ -101,7 +101,4 @@ if (-not $RunInBackground) {
         Receive-Job $serverJob.Id
         Start-Sleep -s 1
     }
-}
-else {
-    Write-Host "To get server logs use the following cmd: Receive-Job $($serverJob.Id))"
 }

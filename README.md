@@ -1,11 +1,19 @@
 # DnsResolver-WebServer
-Simple powershell web server example.
+Simple powershell web server example. It is a client-server app resolving host names on the remote/server machine.
 
 ### server.ps1
 
 Starts web server listening on given address.
 
 Usage: ``.\server.ps1 -Url "http://localhost:8080"``
+
+### client.ps1
+
+Client script for fetching resolved ips from server. It can update hosts file if the UpdateHostsFile flag was used.
+
+Usage: ``.\client.ps1 -Server "http://server-host:8080" -HostToResolve host-name -UpdateHostsFile``
+
+Server address parameter is being cached in local file so you can skip it in the following commands.
 
 ### server-runner.ps1
 
@@ -21,6 +29,3 @@ Usage:
 * ``.\server-runner.ps1 -Url "http://localhost:8080" -Stop``
 
   Terminates running server instance
-
-### Examples
-* [DnsResolver](https://github.com/maxwroc/DnsResolver-WebServer/tree/DnsResolver-ClientServer) - It is a client-server app resolving host names on the remote/server machine.

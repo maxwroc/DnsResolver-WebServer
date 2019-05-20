@@ -23,6 +23,30 @@ Add-Type -AssemblyName System.Web
 
 # Script snippets / handlers for request paths
 $routes = @{
+    "/dns" = {
+        Param($queryParams)
+
+        $response = @{
+            host = $queryParams["host"]
+        }
+
+        if (-not $queryParams["host"]) {
+            $response["error"] = "Missing host param"
+            return $response | ConvertTo-Json -Depth 2
+        }
+
+        # Iterate over resolve result taking first address fromt he following order IpAddress Ip4Address Ip6Address
+        $ip = Resolve-DnsName $queryParams["host"] | % {$ip=$null}{ $ip=@($_.IpAddress, $_.Ip4Address, $_.Ip6Address, $ip, $null -ne $null)[0] }{$ip}
+
+        if (-not $ip) {
+            $response["error"] = "Could not resolve given host"
+            return $response | ConvertTo-Json -Depth 2
+        }
+
+        $response["ip"] = $ip
+
+        return $response | ConvertTo-Json -Depth 2
+    };
     "/sleep" = {
         Param($queryParams)
 
